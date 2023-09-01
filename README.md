@@ -47,4 +47,3 @@ node index.js
 ---
 
 Creado por benosg
-```
