@@ -1,4 +1,4 @@
-/node_modules
+./node_modules
 .env
 
 # Miscellaneous
@@ -15,3 +15,4 @@ Thumbs.db
 
 # Local npm modules
 node_modules/
+/node_modules
