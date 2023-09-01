@@ -1,0 +1,17 @@
+/node_modules
+.env
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
+
+# Cache and npm cache
+.cache/
+.npm/
+.npmrc
+
+# Yarn
+.yarn/
+
+# Local npm modules
+node_modules/
