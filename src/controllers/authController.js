@@ -1,11 +1,11 @@
-const { Router } = require("express");
+import { Router } from "express";
 const router = Router();
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs"); // Import bcrypt for password hashing
-const config = require("../config");
-const { body, validationResult } = require("express-validator");
-const verifyToken = require("./verifyToken");
-const User = require("../models/User");
+import { sign } from "jsonwebtoken";
+import { hash, compare } from "bcryptjs"; // Import bcrypt for password hashing
+import { secret } from "../config";
+import { body, validationResult } from "express-validator";
+import verifyToken from "./verifyToken";
+import User, { findOne, findById } from "../models/User";
 
 // POST: User Signup
 router.post(
@@ -27,12 +27,12 @@ router.post(
 
     try {
       // Check if email already exists
-      const existingUser = await User.findOne({ email: email });
+      const existingUser = await findOne({ email: email });
       if (existingUser) {
         return res.status(400).json({ message: "Email already in use" });
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+      const hashedPassword = await hash(password, 10); // Hash the password
 
       const user = new User({
         username: username,
@@ -42,7 +42,7 @@ router.post(
 
       await user.save();
 
-      const token = jwt.sign({ id: user._id }, config.secret, {
+      const token = sign({ id: user._id }, secret, {
         expiresIn: "1d",
       });
 
@@ -58,19 +58,19 @@ router.post("/signin", async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email: email });
+    const user = await findOne({ email: email });
 
     if (!user) {
       return res.status(404).json({ message: "Email not found" });
     }
 
-    const validPassword = await bcrypt.compare(password, user.password);
+    const validPassword = await compare(password, user.password);
 
     if (!validPassword) {
       return res.status(401).json({ auth: false, message: "Invalid password" });
     }
 
-    const token = jwt.sign({ id: user._id }, config.secret, {
+    const token = sign({ id: user._id }, secret, {
       expiresIn: "1d",
     });
 
@@ -83,7 +83,7 @@ router.post("/signin", async (req, res, next) => {
 // GET: User Profile
 router.get("/me", verifyToken, async (req, res, next) => {
   try {
-    const user = await User.findById(req.userId, { password: 0 });
+    const user = await findById(req.userId, { password: 0 });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -95,4 +95,4 @@ router.get("/me", verifyToken, async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;

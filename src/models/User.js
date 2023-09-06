@@ -1,17 +1,17 @@
-const { Schema, model } = require("mongoose");
-const bcrypt = require("bcryptjs");
+import { Schema, model } from "mongoose";
+import { genSalt, hash, compare } from "bcryptjs";
 const userSchema = new Schema({
   username: String,
   email: String,
   password: String,
 });
 userSchema.methods.encryptPassword = async (password) => {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(password, salt);
+  const salt = await genSalt(10);
+  return hash(password, salt);
 };
 
 userSchema.methods.validatePassword = async function (password) {
-  return bcrypt.compare(password, this.password);
+  return compare(password, this.password);
 };
 
-module.exports = model("User", userSchema);
+export default model("User", userSchema);

@@ -1,5 +1,5 @@
-const jwt = require("jsonwebtoken");
-const config = require("../config");
+import { verify } from "jsonwebtoken";
+import { secret } from "../config";
 function verifyToken(req, res, next) {
   const token = req.headers["x-access-token"];
   if (!token) {
@@ -8,8 +8,8 @@ function verifyToken(req, res, next) {
       message: "No Token provided",
     });
   }
-  const decoded = jwt.verify(token, config.secret);
+  const decoded = verify(token, secret);
   req.userId = decoded.id;
   next();
 }
-module.exports = verifyToken;
+export default verifyToken;
