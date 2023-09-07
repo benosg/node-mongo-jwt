@@ -33,7 +33,7 @@ npm install
 1. Para iniciar el servidor, ejecuta el siguiente comando en la línea de comandos:
 
 ```bash
-node index.js
+npm run dev
 ```
 
 2. La API estará disponible en `http://localhost:3000` por defecto. Los endpoints disponibles son:
