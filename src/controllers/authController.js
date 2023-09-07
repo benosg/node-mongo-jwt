@@ -27,12 +27,12 @@ router.post(
 
     try {
       // Check if email already exists
-      const existingUser = await user.findOne({ email: email });
+      const existingUser = await User.findOne({ email: email });
       if (existingUser) {
         return res.status(400).json({ message: "Email already in use" });
       }
 
-      const hashedPassword = await hash(password, 10); // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
 
       const user = new User({
         username: username,
@@ -42,7 +42,7 @@ router.post(
 
       await user.save();
 
-      const token = bcrypt.sign({ id: user._id }, secret, {
+      const token = jwt.sign({ id: user._id }, secret, {
         expiresIn: "1d",
       });
 
@@ -58,7 +58,7 @@ router.post("/signin", async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
-    const user = await user.findOne({ email: email });
+    const user = await User.findOne({ email: email });
 
     if (!user) {
       return res.status(404).json({ message: "Email not found" });
@@ -70,7 +70,7 @@ router.post("/signin", async (req, res, next) => {
       return res.status(401).json({ auth: false, message: "Invalid password" });
     }
 
-    const token = bcrypt.sign({ id: user._id }, secret, {
+    const token = jwt.sign({ id: user._id }, secret, {
       expiresIn: "1d",
     });
 
