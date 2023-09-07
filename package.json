@@ -1,6 +1,7 @@
 {
   "name": "mongo-jwt",
   "version": "1.0.0",
+  "type": "module",
   "description": "ejemplp Basico de uso de jwt ,node,mongo",
   "main": "index.js",
   "scripts": {

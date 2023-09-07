@@ -1,11 +1,11 @@
 import { Router } from "express";
 const router = Router();
-import { sign } from "jsonwebtoken";
-import { hash, compare } from "bcryptjs"; // Import bcrypt for password hashing
-import { secret } from "../config";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import { secret } from "../config.js";
 import { body, validationResult } from "express-validator";
-import verifyToken from "./verifyToken";
-import User, { findOne, findById } from "../models/User";
+import verifyToken from "./verifyToken.js";
+import User from "../models/User.js";
 
 // POST: User Signup
 router.post(
@@ -27,7 +27,7 @@ router.post(
 
     try {
       // Check if email already exists
-      const existingUser = await findOne({ email: email });
+      const existingUser = await user.findOne({ email: email });
       if (existingUser) {
         return res.status(400).json({ message: "Email already in use" });
       }
@@ -42,7 +42,7 @@ router.post(
 
       await user.save();
 
-      const token = sign({ id: user._id }, secret, {
+      const token = bcrypt.sign({ id: user._id }, secret, {
         expiresIn: "1d",
       });
 
@@ -58,19 +58,19 @@ router.post("/signin", async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
-    const user = await findOne({ email: email });
+    const user = await user.findOne({ email: email });
 
     if (!user) {
       return res.status(404).json({ message: "Email not found" });
     }
 
-    const validPassword = await compare(password, user.password);
+    const validPassword = await bcrypt.compare(password, user.password);
 
     if (!validPassword) {
       return res.status(401).json({ auth: false, message: "Invalid password" });
     }
 
-    const token = sign({ id: user._id }, secret, {
+    const token = bcrypt.sign({ id: user._id }, secret, {
       expiresIn: "1d",
     });
 
@@ -83,7 +83,7 @@ router.post("/signin", async (req, res, next) => {
 // GET: User Profile
 router.get("/me", verifyToken, async (req, res, next) => {
   try {
-    const user = await findById(req.userId, { password: 0 });
+    const user = await user.findById(req.userId, { password: 0 });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

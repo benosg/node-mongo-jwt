@@ -1,6 +1,7 @@
-import { verify } from "jsonwebtoken";
-import { secret } from "../config";
-function verifyToken(req, res, next) {
+import jwt from "jsonwebtoken";
+import "../config.js";
+
+export default function verifyToken(req, res, next) {
   const token = req.headers["x-access-token"];
   if (!token) {
     return res.status(401).json({
@@ -8,8 +9,8 @@ function verifyToken(req, res, next) {
       message: "No Token provided",
     });
   }
+
   const decoded = verify(token, secret);
   req.userId = decoded.id;
   next();
 }
-export default verifyToken;
