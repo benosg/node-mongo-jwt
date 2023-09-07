@@ -10,7 +10,7 @@ export default function verifyToken(req, res, next) {
     });
   }
 
-  const decoded = verify(token, secret);
+  const decoded = jwt.verify(token, secret);
   req.userId = decoded.id;
   next();
 }
